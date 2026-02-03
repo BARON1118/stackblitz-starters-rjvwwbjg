@@ -1,0 +1,109 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #eef1f6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.chat-container {
+  width: 400px;
+  height: 600px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+header {
+  background: #3ecf8e; /* Supabase 綠 */
+  color: white;
+  padding: 15px;
+  text-align: center;
+}
+
+.message-box {
+  flex: 1;
+  padding: 15px;
+  overflow-y: auto; /* 允許垂直捲動 */
+  background: #f9f9f9;
+}
+
+/* 單條訊息樣式 */
+.message {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: #fff;
+  border-radius: 8px;
+  border-left: 4px solid #3ecf8e;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  animation: fadeIn 0.3s ease;
+}
+
+.message strong {
+  color: #333;
+  display: block;
+  font-size: 0.9em;
+  margin-bottom: 4px;
+}
+
+.message span {
+  color: #555;
+  word-break: break-all;
+}
+
+.message .time {
+  font-size: 0.7em;
+  color: #999;
+  float: right;
+  margin-top: 4px;
+}
+
+.input-area {
+  padding: 15px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 8px;
+}
+
+#username {
+  width: 20%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#content {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#send-btn {
+  padding: 8px 16px;
+  background: #3ecf8e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#send-btn:hover {
+  background: #34b27b;
+}
+
+.loading {
+  text-align: center;
+  color: #999;
+  margin-top: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原生 JS x Supabase 即時聊天室</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+    <div class="chat-container">
+        <header>
+            <h2>💬 即時聊天室</h2>
+        </header>
+
+        <div id="message-box" class="message-box">
+            <p class="loading">載入訊息中...</p>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="username" placeholder="你的暱稱" value="訪客">
+            <input type="text" id="content" placeholder="輸入訊息..." autocomplete="off">
+            <button id="send-btn">發送</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
