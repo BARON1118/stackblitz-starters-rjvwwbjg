@@ -107,3 +107,10 @@ header {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+.icon-btn { cursor: pointer; font-size: 20px; background: none; border: none; padding: 5px; }
+.recording-active { color: red; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.5; } }
+
+/* 訊息內的媒體樣式 */
+.chat-media { max-width: 200px; max-height: 200px; border-radius: 8px; margin-top: 8px; display: block; }
+audio { width: 100%; margin-top: 8px; }

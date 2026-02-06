@@ -117,6 +117,108 @@ contentInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
+
+let mediaRecorder;
+let audioChunks = [];
+
+// 1. 檔案上傳至 Bucket
+async function uploadToSupabase(file, typeFolder) {
+    const fileName = `${typeFolder}/${Date.now()}-${file.name || 'record.webm'}`;
+    const { data, error } = await supabaseClient.storage
+        .from('2223127')
+        .upload(fileName, file);
+
+    if (error) throw error;
+
+    const { data: urlData } = supabaseClient.storage
+        .from('2223127')
+        .getPublicUrl(fileName);
+    
+    return urlData.publicUrl;
+}
+
+// 2. 顯示訊息 (判斷檔案類型)
+function displayMessage(msg) {
+    const div = document.createElement('div');
+    div.className = 'message';
+    
+    let mediaHTML = '';
+    if (msg.image_url) {
+        if (msg.file_type === 'image') mediaHTML = `<img src="${msg.image_url}" class="chat-media">`;
+        else if (msg.file_type === 'video') mediaHTML = `<video src="${msg.image_url}" controls class="chat-media"></video>`;
+        else if (msg.file_type === 'audio') mediaHTML = `<audio src="${msg.image_url}" controls></audio>`;
+    }
+
+    div.innerHTML = `
+        <strong>${msg.username}</strong>
+        ${msg.content ? `<div>${msg.content}</div>` : ''}
+        ${mediaHTML}
+        <small>${new Date(msg.created_at).toLocaleTimeString()}</small>
+    `;
+    messageBox.appendChild(div);
+    messageBox.scrollTop = messageBox.scrollHeight;
+}
+
+// 3. 發送訊息至資料表
+async function sendToDB(content, fileUrl = null, fileType = 'text') {
+    const username = document.getElementById('username').value;
+    await supabaseClient.from('message').insert({
+        username, content, image_url: fileUrl, file_type: fileType
+    });
+}
+
+// 4. 錄音功能實作
+recordBtn.onclick = async () => {
+    if (!mediaRecorder || mediaRecorder.state === "inactive") {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+            statusBar.innerText = "正在上傳錄音...";
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+            const url = await uploadToSupabase(audioBlob, 'audio');
+            await sendToDB('', url, 'audio');
+            statusBar.innerText = "";
+        };
+
+        mediaRecorder.start();
+        recordBtn.classList.add('recording-active');
+        statusBar.innerText = "🔴 錄音中...";
+    } else {
+        mediaRecorder.stop();
+        recordBtn.classList.remove('recording-active');
+    }
+};
+
+// 5. 圖片/影片上傳實作
+fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    statusBar.innerText = "檔案上傳中...";
+    const isVideo = file.type.startsWith('video');
+    const type = isVideo ? 'video' : 'image';
+    
+    try {
+        const url = await uploadToSupabase(file, type);
+        await sendToDB('', url, type);
+    } catch (err) {
+        alert("上傳失敗");
+    }
+    statusBar.innerText = "";
+};
+
+// 6. 一般文字發送
+document.getElementById('send-btn').onclick = () => {
+    const content = document.getElementById('content').value;
+    if (!content.trim()) return;
+    sendToDB(content);
+    document.getElementById('content').value = '';
+};
+
+// 初始化 (獲取歷史訊息與即時監聽請參考之前的 fetchMessages 和 setupRealtime)
 // 程式啟動
 fetchMessages(); // 載入舊訊息
 setupRealtime(); // 啟動監聽
