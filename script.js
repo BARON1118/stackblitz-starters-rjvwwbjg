@@ -1,3 +1,48 @@
+// 1. 初始化 Supabase (請替換成你的 URL 和 Key)
+const supabaseUrl = 'https://stackblitzstartersrjvwwbjg-tn15--8080--61636aac.local-credentialless.webcontainer.io/;
+const supabaseKey = 'your-anon-key';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+const loginBtn = document.getElementById('login-btn');
+const emailInput = document.getElementById('email');
+const authMsg = document.getElementById('auth-msg');
+
+// 2. 處理 Magic Link 發送
+loginBtn.addEventListener('click', async () => {
+    const email = emailInput.value;
+    if (!email) return alert('請輸入 Email');
+
+    const { error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+            // 登入後的導向位址 (通常是你的網頁首頁)
+            emailRedirectTo: window.location.href, 
+        },
+    });
+
+    if (error) {
+        authMsg.innerText = "錯誤: " + error.message;
+    } else {
+        authMsg.style.color = "#2a9d8f";
+        authMsg.innerText = "✅ 驗證信已寄出！請檢查你的信箱。";
+    }
+});
+
+// 3. 監聽登入狀態改變
+supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+        // 登入成功：隱藏登入區，顯示聊天區
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('chat-interface').style.display = 'block';
+        
+        // 自動帶入 Email 作為預設暱稱
+        document.getElementById('username').value = session.user.email.split('@')[0];
+        
+        console.log('使用者已登入:', session.user);
+        // 此處可觸發載入訊息的 function
+        loadMessages();
+    }
+});
 // ---------------- 設定區 ----------------
 // 請到 Supabase 後台 -> Settings -> API 複製這些資訊
 const SUPABASE_URL = 'https://msailwslireueorwzwpd.supabase.co';
